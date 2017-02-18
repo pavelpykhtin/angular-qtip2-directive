@@ -3,35 +3,64 @@
   'use strict';
 
   angular.module('qtip2', [])
-    .directive('qtip', function() {
+    .provider('qtipDefaults', function(){
+      var self = this;
+      
+      self.defaults = {
+        position: {
+          my: 'bottom center',
+          at: 'top center'
+        },
+        hide: {
+          fixed : true,
+          delay : 100
+        },
+        style: 'qtip'
+      };
+
+      self.$get = getDefaults;
+      self.setDefaults = setDefaults;
+
+      function setDefaults(defaults){
+        if(!defaults)
+          defaults = {};
+
+        return angular.merge(self.defaults, defaults);
+      }
+
+      function getDefaults(){
+        return self;
+      }
+    })
+    .directive('qtip', ['qtipDefaults', function(qtipDefaults) {
       return {
         restrict: 'A',
         scope : {
             qtipVisible : '='
         },
         link: function(scope, element, attrs) {
-          var my = attrs.qtipMy || 'bottom center'
-            , at = attrs.qtipAt || 'top center'
-            , qtipClass = attrs.qtipClass || 'qtip'
+          var my = attrs.qtipMy
+            , at = attrs.qtipAt
+            , qtipClass = attrs.qtipClass
             , content = attrs.qtipContent || attrs.qtip;
-        
+
           if (attrs.qtipTitle) {
             content = {'title': attrs.qtipTitle, 'text': attrs.qtip};
           }
 
-          $(element).qtip({
+          var attrOptions = {
             content: content,
             position: {
-              my: my,
-              at: at,
-              target: element
-            },
-            hide: {
-              fixed : true,
-              delay : 100
+            	my: my,
+            	at: at,
+            	target: element
             },
             style: qtipClass
-          });
+          }
+
+          var options = angular.merge({}, qtipDefaults, attrOptions);
+
+          $(element).qtip(options);
 
           if(attrs.qtipVisible) {
               scope.$watch('qtipVisible', function (newValue, oldValue) {
@@ -40,6 +69,25 @@
           }
         }
       }
+
+      removeEmpties = function(obj, deep) {
+        var k, results, v;
+        if (deep == null) {
+          deep = true;
+        }
+        results = [];
+        for (k in obj) {
+          v = obj[k];
+          if ((v != null) && typeof v === 'object' && deep) {
+            results.push(removeEmpties(obj[k], deep));
+          } else if (v == null) {
+            results.push(delete obj[k]);
+          } else {
+            results.push(void 0);
+          }
+        }
+        return results;
+      };
     })
 
 }(window.jQuery);
