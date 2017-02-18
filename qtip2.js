@@ -59,7 +59,7 @@
 
           removeEmpties(attrOptions);
           var options = angular.merge({}, qtipDefaults, attrOptions);
-          options.position.target: element;
+          options.position.target = element;
 
           $(element).qtip(options);
 
