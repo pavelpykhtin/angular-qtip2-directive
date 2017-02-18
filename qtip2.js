@@ -36,16 +36,18 @@
       return {
         restrict: 'A',
         scope : {
-            qtipVisible : '='
+            qtipVisible : '=',
+            qtipContent: '=',
+            qtipTitle: '='
         },
         link: function(scope, element, attrs) {
           var my = attrs.qtipMy
             , at = attrs.qtipAt
             , qtipClass = attrs.qtipClass
-            , content = attrs.qtipContent || attrs.qtip;
+            , content = scope.qtipContent;
 
           if (attrs.qtipTitle) {
-            content = {'title': attrs.qtipTitle, 'text': attrs.qtip};
+            content = {'title': scope.qtipTitle, 'text': scope.qtip};
           }
 
           var attrOptions = {
@@ -63,11 +65,34 @@
 
           $(element).qtip(options);
 
+          var api = $(element).qtip('api');
+
           if(attrs.qtipVisible) {
               scope.$watch('qtipVisible', function (newValue, oldValue) {
                   $(element).qtip('toggle', newValue);
               });
           }
+
+          if (attrs.qtipContent) {
+            scope.$watch('qtipContent', function (newValue, oldValue) {
+              $(element).qtip('option', 'content.text', newValue);
+
+              if (newValue)
+                $(element).qtip('enable');
+              else
+                $(element).qtip('disable');
+
+            });
+          }
+          if (attrs.qtipTitle) {
+            scope.$watch('qtipTitle', function (newValue, oldValue) {
+              $(element).qtip('option', 'content.title', newValue);
+            });
+          }
+
+          scope.$on('$destroy', function() {
+            api.destroy(true);
+          });
         }
       }
 
