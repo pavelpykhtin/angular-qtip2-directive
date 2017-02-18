@@ -51,9 +51,9 @@
           var attrOptions = {
             content: content,
             position: {
-            	my: my,
-            	at: at,
-            	target: element
+              my: my,
+              at: at,
+              target: element
             },
             style: qtipClass
           }
@@ -89,6 +89,5 @@
         }
         return results;
       }
-    })
-
+    }]);
 }(window.jQuery);
