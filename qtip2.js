@@ -58,6 +58,7 @@
             style: qtipClass
           }
 
+          removeEmpties(attrOptions);
           var options = angular.merge({}, qtipDefaults, attrOptions);
 
           $(element).qtip(options);
@@ -70,7 +71,7 @@
         }
       }
 
-      removeEmpties = function(obj, deep) {
+      function removeEmpties(obj, deep) {
         var k, results, v;
         if (deep == null) {
           deep = true;
@@ -87,7 +88,7 @@
           }
         }
         return results;
-      };
+      }
     })
 
 }(window.jQuery);
