@@ -60,12 +60,12 @@
           }
 
           removeEmpties(attrOptions);
-          var options = angular.merge({}, qtipDefaults, attrOptions);
+          var options = angular.merge({}, qtipDefaults.defaults, attrOptions);
           options.position.target = element;
 
-          $(element).qtip(options);
-
-          var api = $(element).qtip('api');
+          var api = $(element)
+            .qtip(options)
+            .qtip('api');
 
           if(attrs.qtipVisible) {
               scope.$watch('qtipVisible', function (newValue, oldValue) {
@@ -90,8 +90,9 @@
             });
           }
 
-          scope.$on('$destroy', function() {
-            api.destroy(true);
+          scope.$on('$destroy', function () {
+            if(api)
+              api.destroy(true);
           });
         }
       }
