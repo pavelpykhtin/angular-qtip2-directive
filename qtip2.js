@@ -1,5 +1,4 @@
 !function($) {
-
   'use strict';
 
   angular.module('qtip2', [])
@@ -35,48 +34,18 @@
     .directive('qtip', ['qtipDefaults', function(qtipDefaults) {
       return {
         restrict: 'A',
-        scope : {
-            qtipVisible : '=',
-            qtipContent: '=',
-            qtipTitle: '='
-        },
         link: function(scope, element, attrs) {
-          var my = attrs.qtipMy
-            , at = attrs.qtipAt
-            , qtipClass = attrs.qtipClass
-            , content = scope.qtipContent;
-
-          if (attrs.qtipTitle) {
-            content = {'title': scope.qtipTitle, 'text': scope.qtip};
-          }
-
-          var attrOptions = {
-            content: content,
-            position: {
-              my: my,
-              at: at
-            },
-            style: qtipClass
-          }
-
-          removeEmpties(attrOptions);
-          var options = angular.merge({}, qtipDefaults.defaults, attrOptions);
-          options.position.target = element;
-
-          var api = $(element)
-            .qtip(options)
-            .qtip('api');
+          var api = getApi(scope, element, attrs);
 
           if(attrs.qtipVisible) {
-              scope.$watch('qtipVisible', function (newValue, oldValue) {
-                  $(element).qtip('toggle', newValue);
+            scope.$watch(attrs.qtipVisible, function (newValue, oldValue) {
+                $(element).qtip('toggle', newValue);
               });
           }
 
           if (attrs.qtipContent) {
-            scope.$watch('qtipContent', function (newValue, oldValue) {
+            scope.$watch(attrs.qtipContent, function (newValue, oldValue) {
               $(element).qtip('option', 'content.text', newValue);
-
               if (newValue)
                 $(element).qtip('enable');
               else
@@ -85,14 +54,13 @@
             });
           }
           if (attrs.qtipTitle) {
-            scope.$watch('qtipTitle', function (newValue, oldValue) {
+            scope.$watch(attrs.qtipTitle, function (newValue, oldValue) {
               $(element).qtip('option', 'content.title', newValue);
             });
           }
 
           scope.$on('$destroy', function () {
-            if(api)
-              api.destroy(true);
+            api && api.destroy(true);
           });
         }
       }
@@ -107,13 +75,50 @@
           v = obj[k];
           if ((v != null) && typeof v === 'object' && deep) {
             results.push(removeEmpties(obj[k], deep));
-          } else if (v == null) {
+          } else if (v === null || angular.isUndefined(v)) {
             results.push(delete obj[k]);
           } else {
             results.push(void 0);
           }
         }
         return results;
+      }
+
+      function getOptions(scope, element, attrs) {
+        var my = attrs.qtipMy
+              , at = attrs.qtipAt
+              , qtipClass = attrs.qtipClass
+              , content = scope.$eval(attrs.qtipContent) || '...';
+        
+        if (attrs.qtipTitle) {
+          content = { 'title': scope.$eval(scope.qtipTitle), 'text': scope.$eval(attrs.qtip) };
+        }
+        
+        var attrOptions = {
+          content: content,
+          position: {
+            my: my,
+            at: at
+          },
+          style: qtipClass
+        }
+        
+        removeEmpties(attrOptions);
+        var options = angular.merge({}, qtipDefaults.defaults, attrOptions);
+        options.position.target = element;
+
+        return options;
+      }
+
+      function getApi(scope, element, attrs, oldApi) {
+        if (oldApi)
+          reutrn;
+      
+        var options = getOptions(scope, element, attrs);
+      
+        return $(element)
+          .qtip(options)
+          .qtip('api');
       }
     }]);
 }(window.jQuery);
