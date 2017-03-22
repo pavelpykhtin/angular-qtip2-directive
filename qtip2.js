@@ -91,7 +91,10 @@
               , content = scope.$eval(attrs.qtipContent) || '...';
         
         if (attrs.qtipTitle) {
-          content = { 'title': scope.$eval(scope.qtipTitle), 'text': scope.$eval(attrs.qtip) };
+        	content = {
+        		'title': scope.$eval(scope.qtipTitle),
+        		'text': scope.$eval(attrs.qtipContent) || scope.$eval(attrs.qtip) || '...'
+	        };
         }
         
         var attrOptions = {
